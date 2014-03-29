@@ -10,6 +10,8 @@ public:
 	void setRotation(float x, float y, float z);
 	void setPerspective(float fov, float aspect, float zNear, float zFar);
 
+	const float* getPosition() const;
+
 	const float* getMatView() const;
 	const float* getMatProjection() const;
 

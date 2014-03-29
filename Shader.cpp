@@ -17,21 +17,43 @@ Shader* Shader::CreateFromSource(GLenum type, const char *source) {
 
 	int result = GL_FALSE;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
-	if (GL_FALSE == result)
+	if (GL_FALSE == result) {
+		char buf[4096] = {0};
+		glGetShaderInfoLog(shader, sizeof(buf), 0, buf);
+		printf("compile error:\n%s\n", buf);
 		return 0;
+	}
 
 	return new Shader(shader);
 }
 
 Shader* Shader::CreateFromFile(GLenum type, const char *filename) {
 	char *source = 0;
+	Shader *shader = 0;
 	FILE *fp = fopen(filename, "r");
-	if (!fp) return 0;
+	if (!fp) {
+		return 0;
+	}
 
-	fseek(fp, 0, SEEK_END); // HERE
+	fseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 
+	source = new char[size + 1];
+	source[size] = 0;
+
+	long true_size = 0;
+	if (1 != (true_size = fread(source, size, 1, fp)) ) {
+		fclose(fp);
+		delete [] source;
+		return 0;
+	}
 	fclose(fp);
-	return CreateFromSource(type, source);
+
+	shader = CreateFromSource(type, source);
+	delete [] source;
+
+	return shader;
 }
 
 GLenum Shader::getType() const {

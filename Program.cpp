@@ -22,3 +22,14 @@ GLuint Program::getProgram() const {
 	if (GL_FALSE == result) return 0;
 	return m_program;
 }
+
+GLuint Program::getAttributeLocation(const char* name) const {
+	if (!getProgram()) return 0;
+	return glGetAttribLocation(m_program, name);
+}
+
+GLuint Program::getUniformLocation(const char* name) const {
+	if (!getProgram()) return 0;
+	return glGetUniformLocation(m_program, name);
+
+}

@@ -47,47 +47,6 @@ unsigned int canvas_indices[] = {
 	20, 21, 22, 20, 22, 23,
 };
 
-const char *vert_shader = 
-R"(#version 400 core
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 texCoord;
-
-uniform mat4 matProj;
-uniform mat4 matView;
-uniform mat4 matModel;
-
-out vec3 worldNormal;
-out vec2 uv;
-
-void main (void) {
-	uv = texCoord;
-
-	worldNormal = (matModel * vec4(normal.xyz, 1.0)).xyz;
-
-	gl_Position = matProj * matView * matModel * vec4(position, 1.0);
-}
-)";
-
-const char *frag_shader = 
-R"(#version 400 core
-in vec3 worldNormal;
-in vec2 uv;
-out vec4 fragColor;
-
-void main (void) {
-
-	vec4 diff = vec4(0.4, 1.0, 0.4, 1.0);
-	vec4 ambi = vec4(0.2, 0.2, 0.2, 1.0);
-	vec3 light = normalize(vec3(1.0, 0.5, 1.0));
-
-	vec4 lightColor = clamp(dot(light, worldNormal), 0.0, 1.0) * diff + ambi;
-
-	float n = noise1(uv * 10.0) * 0.5 + 0.5;
-	fragColor = vec4(n, n, n, 1.0) * lightColor;
-}
-)";
-
 void _check_error(const char* filename, int line) {
 	GLuint err = glGetError();
 	if (err != GL_NO_ERROR)
@@ -105,20 +64,24 @@ class Lab : public Engine {
 	GLuint locModel;
 	GLuint locView;
 	GLuint locProj;
+	GLuint locPos;
 
 	unsigned int count;
 public:
 
 	virtual bool onInit() {
-		m_program.attachVertexShader(Shader::CreateFromSource(GL_VERTEX_SHADER, vert_shader));
-		m_program.attachPixelShader(Shader::CreateFromSource(GL_FRAGMENT_SHADER, frag_shader));
+		// m_program.attachVertexShader(Shader::CreateFromFile(GL_VERTEX_SHADER, "assets/diffuse_lighting.vert"));
+		// m_program.attachPixelShader(Shader::CreateFromFile(GL_FRAGMENT_SHADER, "assets/diffuse_lighting.frag"));
+		m_program.attachVertexShader(Shader::CreateFromFile(GL_VERTEX_SHADER, "assets/specular_lighting.vert"));
+		m_program.attachPixelShader(Shader::CreateFromFile(GL_FRAGMENT_SHADER, "assets/specular_lighting.frag"));
 		m_program.link();
 		assert(m_program.getProgram());
 		useProgram(&m_program);
 
-		locModel = glGetUniformLocation(m_program.getProgram(), "matModel");
-		locView = glGetUniformLocation(m_program.getProgram(), "matView");
-		locProj = glGetUniformLocation(m_program.getProgram(), "matProj");
+		locModel = m_program.getUniformLocation("matModel");
+		locView = m_program.getUniformLocation("matView");
+		locProj = m_program.getUniformLocation("matProj");
+		locPos = m_program.getUniformLocation("cameraPos");
 
 		m_camera.setPosition(0, 2, 2);
 		m_camera.setRotation(-M_PI * 0.25f, 0.0f, 0.0f);
@@ -126,6 +89,7 @@ public:
 
 		glUniformMatrix4fv(locProj, 1, GL_FALSE, m_camera.getMatProjection());
 		glUniformMatrix4fv(locView, 1, GL_FALSE, m_camera.getMatView());
+		glUniform3fv(locPos, 1, m_camera.getPosition());
 
 		AttributeDesc layout[] = {
 			{0, 3, GL_FLOAT, sizeof(float) * 8, 0},
@@ -150,6 +114,8 @@ public:
 		// glUniformMatrix4fv(locView, 1, GL_FALSE, m_camera.getMatView());
 
 		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)M_PI * 0.1f * r, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, (float)M_PI * 0.2f * r, glm::vec3(0.0f, 0.0f, 1.0f));
+		// glm::mat4 model = glm::mat4(1.0f);
 		glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(model));
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

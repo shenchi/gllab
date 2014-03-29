@@ -14,6 +14,9 @@ void Camera::setRotation(float x, float y, float z) {
 	updateView();
 }
 
+const float* Camera::getPosition() const {
+	return value_ptr(m_pos);
+}
 
 void Camera::updateView() {
 	m_view = mat4(1.0f);

@@ -16,6 +16,9 @@ public:
 
 	GLuint getProgram() const;
 
+	GLuint getAttributeLocation(const char* name) const;
+	GLuint getUniformLocation(const char* name) const;
+
 private:
 	GLuint m_program;
 
