@@ -57,18 +57,13 @@ uniform mat4 matProj;
 uniform mat4 matView;
 uniform mat4 matModel;
 
-out vec4 color;
+out vec3 worldNormal;
 out vec2 uv;
 
 void main (void) {
 	uv = texCoord;
-	vec4 diff = vec4(0.4, 1.0, 0.4, 1.0);
-	vec4 ambi = vec4(0.2, 0.2, 0.2, 1.0);
-	vec4 light = normalize(vec4(1.0, 0.5, 1.0, 0.0));
 
-	vec4 worldNormal = matModel * vec4(normal.xyz, 1.0);
-
-	color = clamp(dot(light, vec4(worldNormal.xyz, 0.0)), 0.0, 1.0) * diff + ambi;
+	worldNormal = (matModel * vec4(normal.xyz, 1.0)).xyz;
 
 	gl_Position = matProj * matView * matModel * vec4(position, 1.0);
 }
@@ -76,13 +71,20 @@ void main (void) {
 
 const char *frag_shader = 
 R"(#version 400 core
-in vec4 color;
+in vec3 worldNormal;
 in vec2 uv;
 out vec4 fragColor;
 
 void main (void) {
+
+	vec4 diff = vec4(0.4, 1.0, 0.4, 1.0);
+	vec4 ambi = vec4(0.2, 0.2, 0.2, 1.0);
+	vec3 light = normalize(vec3(1.0, 0.5, 1.0));
+
+	vec4 lightColor = clamp(dot(light, worldNormal), 0.0, 1.0) * diff + ambi;
+
 	float n = noise1(uv * 10.0) * 0.5 + 0.5;
-	fragColor = vec4(n, n, n, 1.0) * color;
+	fragColor = vec4(n, n, n, 1.0) * lightColor;
 }
 )";
 

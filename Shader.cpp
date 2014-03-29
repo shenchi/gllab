@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include <cstdio>
 
 Shader::~Shader() {
 	if (m_shader) glDeleteShader(m_shader);
@@ -24,7 +25,12 @@ Shader* Shader::CreateFromSource(GLenum type, const char *source) {
 
 Shader* Shader::CreateFromFile(GLenum type, const char *filename) {
 	char *source = 0;
-	// TODO
+	FILE *fp = fopen(filename, "r");
+	if (!fp) return 0;
+
+	fseek(fp, 0, SEEK_END); // HERE
+
+	fclose(fp);
 	return CreateFromSource(type, source);
 }
 
