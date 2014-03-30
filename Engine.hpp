@@ -1,10 +1,10 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include "common.h"
-#include "Camera.h"
-#include "VertexBuffer.h"
-#include "Program.h"
+#include "common.hpp"
+#include "Camera.hpp"
+#include "VertexBuffer.hpp"
+#include "Program.hpp"
 
 class Engine {
 	Engine(const Engine &) {}

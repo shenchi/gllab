@@ -1,5 +1,4 @@
-#include "VertexBuffer.h"
-
+#include "VertexBuffer.hpp"
 
 VertexBuffer::~VertexBuffer() {
 	glBindVertexArray(m_vao);
@@ -91,6 +90,14 @@ VertexBuffer *VertexBuffer::CreateVertexBuffer(AttributeDesc *layout, int numAtt
 	return new VertexBuffer(vao, vbo, ibo, numVertices, numIndices);
 }
 
+
+void VertexBuffer::setData(GLintptr offset, GLsizeiptr size, const void* data) {
+	if (!m_vao || !m_vbo) return;
+
+	glBindVertexArray(m_vao);
+	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+	glBindVertexArray(0);
+}
 
 void VertexBuffer::render() {
 	if (!m_vao) return;

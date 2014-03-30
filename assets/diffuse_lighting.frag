@@ -1,6 +1,6 @@
 #version 400 core
 in vec3 worldNormal;
-in vec2 uv;
+//in vec2 uv;
 out vec4 fragColor;
 
 void main (void) {
@@ -11,6 +11,8 @@ void main (void) {
 
 	vec4 lightColor = clamp(dot(light, worldNormal), 0.0, 1.0) * diff + ambi;
 
-	float n = noise1(uv * 10.0) * 0.5 + 0.5;
-	fragColor = vec4(n, n, n, 1.0) * lightColor;
+	// float n = noise1(uv * 10.0) * 0.5 + 0.5;
+	// vec4 texColor = vec4(n, n, n, 1.0);
+	vec4 texColor = vec4(0.7, 0.7, 0.7, 1.0);
+	fragColor = texColor * lightColor;
 }

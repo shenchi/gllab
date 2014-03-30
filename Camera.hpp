@@ -8,6 +8,8 @@ class Camera {
 public:
 	void setPosition(float x, float y, float z);
 	void setRotation(float x, float y, float z);
+
+	void setLookAt(float x, float y, float z, float upX, float upY, float upZ);
 	void setPerspective(float fov, float aspect, float zNear, float zFar);
 
 	const float* getPosition() const;

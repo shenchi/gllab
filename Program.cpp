@@ -1,4 +1,4 @@
-#include "Program.h"
+#include "Program.hpp"
 
 Program::~Program() {
 	if (m_program) glDeleteProgram(m_program);

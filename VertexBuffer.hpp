@@ -1,7 +1,7 @@
 #ifndef VERTEXBUFFER_H
 #define VERTEXBUFFER_H
 
-#include "common.h"
+#include "common.hpp"
 
 struct AttributeDesc {
 	int location;
@@ -9,6 +9,13 @@ struct AttributeDesc {
 	GLenum type;
 	int stride;
 	void* offset;
+
+	AttributeDesc(int _location, int _components, GLenum _type, int _stride, void* _offset):
+		location(_location),
+		components(_components),
+		type(_type),
+		stride(_stride),
+		offset(_offset) {}
 };
 
 class VertexBuffer {
@@ -25,6 +32,8 @@ public:
 	static VertexBuffer *CreateVertexBuffer(AttributeDesc *layout, int numAttributes, 
 		int numVertices, const void* data = 0, int numIndices = 0, const void* idxData = 0);
 
+
+	void setData(GLintptr offset, GLsizeiptr size, const void* data);
 
 	void render();
 

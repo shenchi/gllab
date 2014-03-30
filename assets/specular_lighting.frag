@@ -2,7 +2,7 @@
 
 in vec3 worldNormal;
 in vec3 worldViewDir;
-in vec2 uv;
+//in vec2 uv;
 out vec4 fragColor;
 
 void main() {
@@ -16,9 +16,8 @@ void main() {
 	specFactor = pow(specFactor, 32);
 	vec4 lightColor = specFactor * spec * 5.0f + ambi;
 
-	float n = noise1(uv * 10.0) * 0.5 + 0.5;
-	vec4 texColor = vec4(n, n, n, 1.0);
-	// vec4 texColor = vec4(0.7, 0.7, 0.7, 1.0);
+	// float n = noise1(uv * 10.0) * 0.5 + 0.5;
+	// vec4 texColor = vec4(n, n, n, 1.0);
+	vec4 texColor = vec4(0.7, 0.7, 0.7, 1.0);
 	fragColor = texColor * lightColor;
-	// fragColor = vec4(specFactor, specFactor, 1.0, 1.0);
 }

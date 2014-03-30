@@ -1,51 +1,10 @@
 #include <cassert>
 #include <cstdio>
 #include <cmath>
-#include "Engine.h"
+#include "Engine.hpp"
+#include "Mesh.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-float canvas[] = {
-	// front
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
-	// back
-	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
-	// left
-	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-	// right
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-	// top
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-	// bottom
-	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
-};
-
-unsigned int canvas_indices[] = {
-	0, 1, 2, 0, 2, 3,
-	4, 5, 6, 4, 6, 7,
-	8, 9, 10, 8, 10, 11,
-	12, 13, 14, 12, 14, 15,
-	16, 17, 18, 16, 18, 19,
-	20, 21, 22, 20, 22, 23,
-};
 
 void _check_error(const char* filename, int line) {
 	GLuint err = glGetError();
@@ -59,7 +18,7 @@ class Lab : public Engine {
 
 	Program m_program;
 	Camera m_camera;
-	VertexBuffer *m_vb;
+	Mesh *m_mesh;
 
 	GLuint locModel;
 	GLuint locView;
@@ -96,14 +55,8 @@ public:
 		glUniformMatrix4fv(locView, 1, GL_FALSE, m_camera.getMatView());
 		// glUniform3fv(locPos, 1, m_camera.getPosition());
 
-		AttributeDesc layout[] = {
-			{0, 3, GL_FLOAT, sizeof(float) * 8, 0},
-			{1, 3, GL_FLOAT, sizeof(float) * 8, (void*)(sizeof(float) * 3)},
-			{2, 2, GL_FLOAT, sizeof(float) * 8, (void*)(sizeof(float) * 6)}
-		};
-
-		m_vb = VertexBuffer::CreateVertexBuffer(layout, 3, 24, canvas, 36, canvas_indices);
-		if (!m_vb) return false;
+		m_mesh = Mesh::CreateFromFile("assets/box.obj");
+		assert(m_mesh != 0);
 
 		count = 0;
 
@@ -128,11 +81,11 @@ public:
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		m_vb->render();
+		m_mesh->render();
 	}
 
 	virtual void onRelease() {
-		delete m_vb;
+		if (m_mesh) delete m_mesh;
 	}
 };
 
