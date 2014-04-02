@@ -24,5 +24,5 @@ Texture* Texture::CreateDepthTexture(int width, int height) {
 }
 
 Texture* Texture::CreateDepthStencilTexture(int width, int height) {
-	return CreateTexture2D(width, height, 0, GL_DEPTH_STENCIL, GL_DEPTH_STENCIL);
+	return CreateTexture2D(width, height, 0, GL_DEPTH_STENCIL, GL_DEPTH_STENCIL, GL_DEPTH24_STENCIL8, 0);
 }

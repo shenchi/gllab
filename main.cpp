@@ -46,7 +46,7 @@ public:
 
 		m_camera.setPosition(0, 2, 2);
 		m_camera.setRotation(-M_PI * 0.25f, 0.0f, 0.0f);
-		m_camera.setPerspective(45.0f, 1.0f, 0.1f, 10.0f);
+		m_camera.setPerspective(45.0f, 800.0f / 600.0f, 0.1f, 10.0f);
 
 		glUniformMatrix4fv(locProj, 1, GL_FALSE, m_camera.getMatProjection());
 		glUniformMatrix4fv(locView, 1, GL_FALSE, m_camera.getMatView());
@@ -55,11 +55,18 @@ public:
 		m_mesh = Mesh::CreateFromFile("assets/box.obj");
 		assert(m_mesh != 0);
 
-		m_framebuffer = FrameBuffer::CreateFrameBuffer(2048, 2048);
+		RenderTargetDesc rts[] = {
+			RenderTargetDesc(GL_RGBA32F, GL_RGBA, GL_FLOAT),
+			RenderTargetDesc(GL_RGBA32F, GL_RGBA, GL_FLOAT),
+			RenderTargetDesc(true),
+			RenderTargetDesc(GL_RGBA16, GL_RGBA, GL_UNSIGNED_SHORT)
+		};
+		m_framebuffer = FrameBuffer::CreateFrameBuffer(1600, 1200, 4, rts);
 		assert(m_framebuffer);
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer->getFrameBuffer());
-
+		GLenum drawbuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+		glDrawBuffers(4, drawbuffers);
 		count = 0;
 
 		glEnable(GL_CULL_FACE);
@@ -73,9 +80,9 @@ public:
 		// m_camera.setRotation(-M_PI * 0.25f, sin(r) * M_PI * 0.1667f, 0.0f);
 		// glUniformMatrix4fv(locView, 1, GL_FALSE, m_camera.getMatView());
 
-		// glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)M_PI * 0.1f * r, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)M_PI * 0.1f * r, glm::vec3(0.0f, -1.0f, 0.0f));
 		// model = glm::rotate(model, (float)M_PI * 0.2f * r, glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 model = glm::mat4(1.0f);
+		// glm::mat4 model = glm::mat4(1.0f);
 		glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(model));
 
 		glm::vec3 lightPos = glm::vec3(0.7 * sin(r * 2), 0.7, 0.7 * cos(r * 2));
@@ -88,7 +95,14 @@ public:
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_framebuffer->getFrameBuffer());
-		glBlitFramebuffer(0, 0, 2048, 2048, 0, 0, 2048, 2048, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		glBlitFramebuffer(0, 0, 1600, 1200, 0, 600, 800, 1200, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		glReadBuffer(GL_COLOR_ATTACHMENT1);
+		glBlitFramebuffer(0, 0, 1600, 1200, 800, 600, 1600, 1200, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		glReadBuffer(GL_COLOR_ATTACHMENT2);
+		glBlitFramebuffer(0, 0, 1600, 1200, 0, 0, 800, 600, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		glReadBuffer(GL_COLOR_ATTACHMENT3);
+		glBlitFramebuffer(0, 0, 1600, 1200, 800, 0, 1600, 600, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	}
 
@@ -101,7 +115,7 @@ public:
 
 int main() {
 	Lab lab;
-	lab.run();
+	lab.run(800, 600);
 	check_error();
 	return 0;
 }
