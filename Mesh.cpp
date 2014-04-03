@@ -12,6 +12,14 @@ using namespace std;
 using namespace Assimp;
 using namespace glm;
 
+Mesh::~Mesh() {
+	for (vector<VertexBuffer*>::iterator i = m_meshes.begin();
+		i != m_meshes.end();
+		++i) {
+		if (*i) delete (*i);
+	}
+}
+
 Mesh* Mesh::CreateFromFile(const char *filename) {
 	Importer importer;
 	const aiScene *scene = importer.ReadFile(filename, aiProcess_Triangulate | /* aiProcess_GenSmoothNormals | */ aiProcess_FlipUVs);
@@ -57,6 +65,30 @@ Mesh* Mesh::CreateFromFile(const char *filename) {
 	}
 
 	// printf("%d mesh in total\n", mesh->m_meshes.size());
+
+	return mesh;
+}
+
+Mesh* Mesh::CreateScreenQuad() {
+	float screenQuads[] = {
+		-1.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+		 1.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+		 1.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+	};
+
+	unsigned int indices[] = {0, 1, 2, 0, 2, 3};
+
+	AttributeDesc layout[] = {
+		{0, 3, GL_FLOAT, sizeof(float) * 5, 0},
+		{1, 2, GL_FLOAT, sizeof(float) * 5, (void*)(sizeof(float) * 3)}
+	};
+
+	VertexBuffer *vb = VertexBuffer::CreateVertexBuffer(layout, 2, 4, screenQuads, 6, indices);
+	if (!vb) return 0;
+
+	Mesh* mesh = new Mesh();
+	mesh->m_meshes.push_back(vb);
 
 	return mesh;
 }

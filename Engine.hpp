@@ -13,7 +13,7 @@ public:
 	Engine() : m_window(0) {}
 	~Engine();
 
-	void run();
+	void run(int w, int h);
 
 protected:
 	virtual bool onInit() = 0;

@@ -3,7 +3,7 @@
 Engine::~Engine() {
 }
 
-void Engine::run() {
+void Engine::run(int w, int h) {
 	if (!glfwInit())
 		return;
 
@@ -12,7 +12,7 @@ void Engine::run() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	m_window = glfwCreateWindow(512, 512, "GLLab", NULL, NULL);
+	m_window = glfwCreateWindow(w, h, "GLLab", NULL, NULL);
 
 	if (!m_window) {
 		glfwTerminate();

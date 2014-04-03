@@ -7,8 +7,10 @@ class VertexBuffer;
 
 class Mesh {
 public:
+	~Mesh();
 
 	static Mesh* CreateFromFile(const char *filename);
+	static Mesh* CreateScreenQuad();
 
 	void render();
 private:
