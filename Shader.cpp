@@ -6,6 +6,16 @@ Shader::~Shader() {
 	m_shader = 0;
 }
 
+const char* Shader::shaderTypeName(GLenum type) {
+	switch (type) {
+	case GL_VERTEX_SHADER:
+		return "vertex shader";
+	case GL_FRAGMENT_SHADER:
+		return "fragment shader";
+	}
+	return "unknow type shader";
+}
+
 Shader* Shader::CreateFromSource(GLenum type, const char *source) {
 	GLuint shader = 0;
 
@@ -20,7 +30,7 @@ Shader* Shader::CreateFromSource(GLenum type, const char *source) {
 	if (GL_FALSE == result) {
 		char buf[4096] = {0};
 		glGetShaderInfoLog(shader, sizeof(buf), 0, buf);
-		printf("compile error:\n%s\n", buf);
+		printf("%s compile error:\n%s\n", shaderTypeName(type), buf);
 		return 0;
 	}
 

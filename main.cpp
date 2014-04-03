@@ -1,11 +1,11 @@
 #include <cassert>
 #include <cstdio>
 #include <cmath>
-#include "Engine.hpp"
-#include "Mesh.hpp"
-#include "FrameBuffer.hpp"
+
+#include "gllab.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 
 void _check_error(const char* filename, int line) {
 	GLuint err = glGetError();
@@ -21,11 +21,25 @@ class Lab : public Engine {
 	Camera m_camera;
 	Mesh *m_mesh;
 	FrameBuffer *m_framebuffer;
+	UniformBuffer *m_uniformbuffer;
 
 	GLuint locModel;
 	GLuint locView;
 	GLuint locProj;
 	GLuint locPos;
+
+	GLuint locBlock;
+
+	struct LightAndMaterial {
+		float matColor[4];
+		float lightPos[4];
+		float lightAmbient[4];
+		float lightDiffuse[4];
+		float lightIntense;
+		float linearAtt;
+		float quadAtt;
+		float unused2;
+	};
 
 	unsigned int count;
 public:
@@ -42,7 +56,8 @@ public:
 		locView = m_program->getUniformLocation("matView");
 		locProj = m_program->getUniformLocation("matProj");
 		// locPos = m_program->getUniformLocation("cameraPos");
-		locPos = m_program->getUniformLocation("lightPos");
+		locBlock = m_program->getUniformBlockIndex("LightAndMaterial");
+		assert(GL_INVALID_INDEX != locBlock);
 
 		m_camera.setPosition(0, 2, 2);
 		m_camera.setRotation(-M_PI * 0.25f, 0.0f, 0.0f);
@@ -51,6 +66,20 @@ public:
 		glUniformMatrix4fv(locProj, 1, GL_FALSE, m_camera.getMatProjection());
 		glUniformMatrix4fv(locView, 1, GL_FALSE, m_camera.getMatView());
 		// glUniform3fv(locPos, 1, m_camera.getPosition());
+
+		LightAndMaterial block = LightAndMaterial {
+			{0.7f, 0.7f, 0.7f, 1.0f},
+			{0.0f, 0.0f, 0.0f, 0.0f},
+			{0.2f, 0.2f, 0.2f, 1.0f},
+			{0.0f, 0.0f, 0.8f, 1.0f},
+			5.0f, 1.0f, 4.0f, 0.0f
+		};
+		assert(sizeof(block) == 20 * 4 && block.quadAtt == 4.0f);
+
+		m_uniformbuffer = UniformBuffer::CreateUniformBuffer(sizeof(LightAndMaterial), &block);
+		// m_uniformbuffer->setData(0, sizeof(LightAndMaterial), &block);
+		m_uniformbuffer->bind(0);
+		glUniformBlockBinding(m_program->getProgram(), locBlock, 0);
 
 		m_mesh = Mesh::CreateFromFile("assets/box.obj");
 		assert(m_mesh != 0);
@@ -85,8 +114,8 @@ public:
 		// glm::mat4 model = glm::mat4(1.0f);
 		glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(model));
 
-		glm::vec3 lightPos = glm::vec3(0.7 * sin(r * 2), 0.7, 0.7 * cos(r * 2));
-		glUniform3fv(locPos, 1, glm::value_ptr(lightPos));
+		glm::vec4 lightPos = glm::vec4(0.7 * sin(r * 2), 0.7f, 0.7 * cos(r * 2), 0.0f);
+		m_uniformbuffer->setData(sizeof(glm::vec4), sizeof(glm::vec4), &lightPos);
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer->getFrameBuffer());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -109,6 +138,7 @@ public:
 	virtual void onRelease() {
 		if (m_mesh) delete m_mesh;
 		if (m_program) delete m_program;
+		if (m_uniformbuffer) delete m_uniformbuffer;
 		if (m_framebuffer) delete m_framebuffer;
 	}
 };

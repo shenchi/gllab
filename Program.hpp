@@ -21,6 +21,7 @@ public:
 
 	GLuint getAttributeLocation(const char* name) const;
 	GLuint getUniformLocation(const char* name) const;
+	GLuint getUniformBlockIndex(const char* name) const;
 
 private:
 	GLuint m_program;

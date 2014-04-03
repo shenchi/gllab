@@ -22,6 +22,8 @@ public:
 
 private:
 	GLuint m_shader;
+
+	static const char* shaderTypeName(GLenum type);
 };
 
 #endif

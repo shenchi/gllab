@@ -64,5 +64,9 @@ GLuint Program::getAttributeLocation(const char* name) const {
 GLuint Program::getUniformLocation(const char* name) const {
 	if (!getProgram()) return 0;
 	return glGetUniformLocation(m_program, name);
+}
 
+GLuint Program::getUniformBlockIndex(const char* name) const {
+	if (!getProgram()) return 0;
+	return glGetUniformBlockIndex(m_program, name);
 }
