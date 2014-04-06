@@ -17,7 +17,7 @@ void _check_error(const char* filename, int line) {
 
 class Lab : public Engine {
 
-	Program *m_program;
+	Material *m_material;
 	Camera m_camera;
 	Mesh *m_mesh;
 	FrameBuffer *m_framebuffer;
@@ -26,7 +26,6 @@ class Lab : public Engine {
 	GLuint locModel;
 	GLuint locView;
 	GLuint locProj;
-	GLuint locPos;
 
 	GLuint locBlock;
 
@@ -45,27 +44,25 @@ class Lab : public Engine {
 public:
 
 	virtual bool onInit() {
+		//========================================
+		// prepare material
 		// m_program = Program::CreateFromFile("assets/diffuse_lighting.vert", "assets/diffuse_lighting.frag");
 		// m_program = Program::CreateFromFile("assets/specular_lighting.vert", "assets/specular_lighting.frag");
-		m_program = Program::CreateFromFile("assets/point_light.vert", "assets/point_light.frag");
+		m_material = Material::CreateMaterial(Program::CreateFromFile("assets/point_light.vert", "assets/point_light.frag"));
 
-		assert(m_program->getProgram());
-		useProgram(m_program);
+		const Program *m_program = m_material->getProgram();
 
 		locModel = m_program->getUniformLocation("matModel");
 		locView = m_program->getUniformLocation("matView");
 		locProj = m_program->getUniformLocation("matProj");
-		// locPos = m_program->getUniformLocation("cameraPos");
-		locBlock = m_program->getUniformBlockIndex("LightAndMaterial");
-		assert(GL_INVALID_INDEX != locBlock);
 
 		m_camera.setPosition(0, 2, 2);
 		m_camera.setRotation(-M_PI * 0.25f, 0.0f, 0.0f);
 		m_camera.setPerspective(45.0f, 800.0f / 600.0f, 0.1f, 10.0f);
 
+		m_material->bind();
 		glUniformMatrix4fv(locProj, 1, GL_FALSE, m_camera.getMatProjection());
 		glUniformMatrix4fv(locView, 1, GL_FALSE, m_camera.getMatView());
-		// glUniform3fv(locPos, 1, m_camera.getPosition());
 
 		LightAndMaterial block = LightAndMaterial {
 			{0.7f, 0.7f, 0.7f, 1.0f},
@@ -74,16 +71,18 @@ public:
 			{0.0f, 0.0f, 0.8f, 1.0f},
 			5.0f, 1.0f, 4.0f, 0.0f
 		};
-		assert(sizeof(block) == 20 * 4 && block.quadAtt == 4.0f);
-
 		m_uniformbuffer = UniformBuffer::CreateUniformBuffer(sizeof(LightAndMaterial), &block);
-		// m_uniformbuffer->setData(0, sizeof(LightAndMaterial), &block);
-		m_uniformbuffer->bind(0);
-		glUniformBlockBinding(m_program->getProgram(), locBlock, 0);
+		m_material->setUniformBuffer("LightAndMaterial", m_uniformbuffer);
+		//========================================
 
+		//========================================
+		// prepare mesh
 		m_mesh = Mesh::CreateFromFile("assets/box.obj");
 		assert(m_mesh != 0);
+		//========================================
 
+		//========================================
+		// prepare frame buffer
 		RenderTargetDesc rts[] = {
 			RenderTargetDesc(GL_RGBA32F, GL_RGBA, GL_FLOAT),
 			RenderTargetDesc(GL_RGBA32F, GL_RGBA, GL_FLOAT),
@@ -96,6 +95,8 @@ public:
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer->getFrameBuffer());
 		GLenum drawbuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 		glDrawBuffers(4, drawbuffers);
+		//========================================
+
 		count = 0;
 
 		glEnable(GL_CULL_FACE);
@@ -106,12 +107,8 @@ public:
 	virtual void onFrame() {
 		count ++;
 		float r = count / 100.0f;
-		// m_camera.setRotation(-M_PI * 0.25f, sin(r) * M_PI * 0.1667f, 0.0f);
-		// glUniformMatrix4fv(locView, 1, GL_FALSE, m_camera.getMatView());
 
 		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)M_PI * 0.1f * r, glm::vec3(0.0f, -1.0f, 0.0f));
-		// model = glm::rotate(model, (float)M_PI * 0.2f * r, glm::vec3(0.0f, 0.0f, 1.0f));
-		// glm::mat4 model = glm::mat4(1.0f);
 		glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(model));
 
 		glm::vec4 lightPos = glm::vec4(0.7 * sin(r * 2), 0.7f, 0.7 * cos(r * 2), 0.0f);
@@ -120,6 +117,7 @@ public:
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer->getFrameBuffer());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		m_material->bind();
 		m_mesh->render();
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -137,7 +135,7 @@ public:
 
 	virtual void onRelease() {
 		if (m_mesh) delete m_mesh;
-		if (m_program) delete m_program;
+		if (m_material) delete m_material;
 		if (m_uniformbuffer) delete m_uniformbuffer;
 		if (m_framebuffer) delete m_framebuffer;
 	}

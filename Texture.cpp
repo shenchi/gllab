@@ -16,7 +16,7 @@ Texture* Texture::CreateTexture2D(int width, int height,
 	glTexImage2D(GL_TEXTURE_2D, level, internalFormat, width, height, 0, format, type, data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	return new Texture(tex);
+	return new Texture(tex, GL_TEXTURE_2D);
 }
 
 Texture* Texture::CreateDepthTexture(int width, int height) {

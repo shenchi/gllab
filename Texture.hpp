@@ -5,7 +5,7 @@
 
 class Texture {
 	Texture(const Texture &) {}
-	Texture(GLuint tex): m_tex(tex) {}
+	Texture(GLuint tex, GLenum target): m_tex(tex), m_target(target) {}
 public:
 	~Texture();
 
@@ -18,12 +18,13 @@ public:
 
 	static Texture* CreateDepthStencilTexture(int width, int height);
 
-
+	GLenum getTarget() const { return m_target; }
 
 	GLuint getTexture() const { return m_tex; }
 
 private:
 	GLuint m_tex;
+	GLenum m_target;
 };
 
 #endif
