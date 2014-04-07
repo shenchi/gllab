@@ -4,7 +4,7 @@ in vec3 worldPos;
 
 out vec4 fragData[4];
 
-layout (std140) uniform LightAndMaterial {
+uniform LightAndMaterial {
 	vec4 matColor;
 	vec3 lightPos;
 	vec4 lightAmbient;

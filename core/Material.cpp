@@ -1,58 +1,135 @@
 #include "Material.hpp"
 #include <cassert>
-#include <cstdio>
+
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace std;
 
 Material* Material::CreateMaterial(Program *program) {
 	assert(program != 0); // TODO add default material
-	return new Material(program);
+	assert(program->getProgram() != 0);
+
+	Material *mat = new Material(program);
+
+	const vector< Program::BlockDesc >& blockList = program->getUniformBlockList();
+	mat->m_uniformBuffers.clear();
+	for (auto& block : blockList) {
+		size_t idx = mat->m_uniformBuffers.size();
+		UniformBuffer *ub = UniformBuffer::CreateUniformBuffer(block.second);
+		if (!ub) {
+			delete mat;
+			return 0;
+		}
+		glUniformBlockBinding(program->getProgram(), idx, idx);
+		mat->m_uniformBuffers.push_back(ub);
+	}
+
+	return mat;
+}
+
+bool Material::setUniform(const string& name, int size, const void* data) {
+	const UniformDesc* desc = m_program->getUniform(name);
+	if (!desc) return false;
+	if (desc->blockIndex < 0) {
+		return false;
+	} else {
+		// if (desc->size < size) return false;
+		m_uniformBuffers[desc->blockIndex]->setData(desc->location, size, data);
+	}
+	return true;
+}
+
+bool Material::setUniform(const std::string& name, GLuint data) {
+	const UniformDesc* desc = m_program->getUniform(name);
+	if (!desc) return false;
+	if (desc->blockIndex < 0) {
+		glUseProgram(m_program->getProgram());
+		glUniform1ui(desc->location, data);
+	} else {
+		// if (desc->size < sizeof(GLuint)) return false;
+		m_uniformBuffers[desc->blockIndex]->setData(desc->location, sizeof(GLuint), &data);
+	}
+	return true;
+}
+
+bool Material::setUniform(const std::string& name, float data) {
+	const UniformDesc* desc = m_program->getUniform(name);
+	if (!desc) return false;
+	if (desc->blockIndex < 0) {
+		glUseProgram(m_program->getProgram());
+		glUniform1f(desc->location, data);
+	} else {
+		// if (desc->size < sizeof(float)) return false;
+		m_uniformBuffers[desc->blockIndex]->setData(desc->location, sizeof(float), &data);
+	}
+	return true;
+}
+
+bool Material::setUniform(const std::string& name, const glm::vec4& data) {
+	const UniformDesc* desc = m_program->getUniform(name);
+	if (!desc) return false;
+	if (desc->blockIndex < 0) {
+		glUseProgram(m_program->getProgram());
+		glUniform4fv(desc->location, 1, glm::value_ptr(data));
+	} else {
+		// if (desc->size < sizeof(glm::vec4)) return false;
+		m_uniformBuffers[desc->blockIndex]->setData(desc->location, sizeof(glm::vec4), glm::value_ptr(data));
+	}
+	return true;
+}
+
+bool Material::setUniform(const std::string& name, const glm::vec3& data) {
+	const UniformDesc* desc = m_program->getUniform(name);
+	if (!desc) return false;
+	if (desc->blockIndex < 0) {
+		glUseProgram(m_program->getProgram());
+		glUniform4fv(desc->location, 1, glm::value_ptr(data));
+	} else {
+		// if (desc->size < sizeof(glm::vec3)) return false;
+		m_uniformBuffers[desc->blockIndex]->setData(desc->location, sizeof(glm::vec3), glm::value_ptr(data));
+	}
+	return true;
+}
+
+bool Material::setUniform(const std::string& name, const glm::mat4& data) {
+	const UniformDesc* desc = m_program->getUniform(name);
+	if (!desc) return false;
+	if (desc->blockIndex < 0) {
+		glUseProgram(m_program->getProgram());
+		glUniformMatrix4fv(desc->location, 1, GL_FALSE, glm::value_ptr(data));
+	} else {
+		// if (desc->size < sizeof(glm::mat4)) return false;
+		m_uniformBuffers[desc->blockIndex]->setData(desc->location, sizeof(glm::mat4), glm::value_ptr(data));
+	}
+	return true;
 }
 
 void Material::setTexture(const string& name, Texture *texture) {
 	if (m_texNames.find(name) == m_texNames.end()) {
-		GLint loc = m_program->getUniformLocation(name.c_str());
-		if (loc < 0) return;
+		if (!m_program->getUniform(name)) return;
 
-		m_texNames[name] = make_pair(m_textures.size(), loc);
+		setUniform(name, (GLuint)m_textures.size());
 		m_textures.push_back(texture);
 	} else {
-		size_t idx = m_texNames[name].first;
+		size_t idx = m_texNames[name];
 		m_textures[idx] = texture;
 	}
 }
 
-void Material::setUniformBuffer(const string& name, UniformBuffer *uniformBuffer) {
-	if (m_ubNames.find(name) == m_ubNames.end()) {
-		GLuint bindIdx = m_program->getUniformBlockIndex(name.c_str());
-		if (GL_INVALID_INDEX == bindIdx) return;
-
-		m_ubNames[name] = make_pair(m_uniformBuffers.size(), bindIdx);
-		m_uniformBuffers.push_back(uniformBuffer);
-	} else {
-		size_t idx = m_ubNames[name].first;
-		m_uniformBuffers[idx] = uniformBuffer;
-	}
-}
 
 void Material::bind() {
 	glUseProgram(m_program->getProgram());
 
-	for (auto& name : m_texNames) {
-		pair<size_t, GLint> &t = name.second;
+	for (size_t idx = 0; idx < m_uniformBuffers.size(); ++idx) {
 
-		glUniform1ui(t.second, t.first);
-		glActiveTexture(t.first);
-		Texture* tex = m_textures[t.first];
-		glBindTexture(tex->getTarget(), tex->getTexture());
+		UniformBuffer *ub = m_uniformBuffers[idx];
+		ub->bind(idx);
 	}
 
-	for (auto& name : m_ubNames) {
-		pair<size_t, GLuint> &b = name.second;
+	for (auto& t : m_texNames) {
 
-		glUniformBlockBinding(m_program->getProgram(), b.second, b.first);
-		UniformBuffer *ub = m_uniformBuffers[b.first];
-		glBindBufferBase(GL_UNIFORM_BUFFER, b.first, ub->getUniformBuffer());
+		Texture* tex = m_textures[t.second];
+		tex->bind(t.second);
 	}
 	
 }

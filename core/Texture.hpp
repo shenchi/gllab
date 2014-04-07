@@ -22,6 +22,8 @@ public:
 
 	GLuint getTexture() const { return m_tex; }
 
+	void bind(GLuint unit);
+
 private:
 	GLuint m_tex;
 	GLenum m_target;

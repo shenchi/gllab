@@ -37,11 +37,3 @@ void Camera::updateView() {
 void Camera::setPerspective(float fov, float aspect, float zNear, float zFar) {
 	m_proj = perspective(fov, aspect, zNear, zFar);
 }
-
-const float* Camera::getMatView() const {
-	return value_ptr(m_view);
-}
-
-const float* Camera::getMatProjection() const {
-	return value_ptr(m_proj);
-}

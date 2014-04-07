@@ -21,24 +21,6 @@ class Lab : public Engine {
 	Camera m_camera;
 	Mesh *m_mesh;
 	FrameBuffer *m_framebuffer;
-	UniformBuffer *m_uniformbuffer;
-
-	GLuint locModel;
-	GLuint locView;
-	GLuint locProj;
-
-	GLuint locBlock;
-
-	struct LightAndMaterial {
-		float matColor[4];
-		float lightPos[4];
-		float lightAmbient[4];
-		float lightDiffuse[4];
-		float lightIntense;
-		float linearAtt;
-		float quadAtt;
-		float unused2;
-	};
 
 	unsigned int count;
 public:
@@ -52,27 +34,19 @@ public:
 
 		const Program *m_program = m_material->getProgram();
 
-		locModel = m_program->getUniformLocation("matModel");
-		locView = m_program->getUniformLocation("matView");
-		locProj = m_program->getUniformLocation("matProj");
-
 		m_camera.setPosition(0, 2, 2);
 		m_camera.setRotation(-M_PI * 0.25f, 0.0f, 0.0f);
 		m_camera.setPerspective(45.0f, 800.0f / 600.0f, 0.1f, 10.0f);
 
-		m_material->bind();
-		glUniformMatrix4fv(locProj, 1, GL_FALSE, m_camera.getMatProjection());
-		glUniformMatrix4fv(locView, 1, GL_FALSE, m_camera.getMatView());
+		m_material->setUniform("matProj", m_camera.getMatProjection());
+		m_material->setUniform("matView", m_camera.getMatView());
 
-		LightAndMaterial block = LightAndMaterial {
-			{0.7f, 0.7f, 0.7f, 1.0f},
-			{0.0f, 0.0f, 0.0f, 0.0f},
-			{0.2f, 0.2f, 0.2f, 1.0f},
-			{0.0f, 0.0f, 0.8f, 1.0f},
-			5.0f, 1.0f, 4.0f, 0.0f
-		};
-		m_uniformbuffer = UniformBuffer::CreateUniformBuffer(sizeof(LightAndMaterial), &block);
-		m_material->setUniformBuffer("LightAndMaterial", m_uniformbuffer);
+		m_material->setUniform("matColor", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+		m_material->setUniform("lightAmbient", glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
+		m_material->setUniform("lightDiffuse", glm::vec4(0.0f, 0.0f, 0.8f, 1.0f));
+		m_material->setUniform("lightIntense", 5.0f);
+		m_material->setUniform("linearAtt", 1.0f);
+		m_material->setUniform("quadAtt", 4.0f);
 		//========================================
 
 		//========================================
@@ -109,10 +83,10 @@ public:
 		float r = count / 100.0f;
 
 		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)M_PI * 0.1f * r, glm::vec3(0.0f, -1.0f, 0.0f));
-		glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(model));
+		m_material->setUniform("matModel", model);
 
 		glm::vec4 lightPos = glm::vec4(0.7 * sin(r * 2), 0.7f, 0.7 * cos(r * 2), 0.0f);
-		m_uniformbuffer->setData(sizeof(glm::vec4), sizeof(glm::vec4), &lightPos);
+		m_material->setUniform("lightPos", lightPos);
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_framebuffer->getFrameBuffer());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -136,7 +110,6 @@ public:
 	virtual void onRelease() {
 		if (m_mesh) delete m_mesh;
 		if (m_material) delete m_material;
-		if (m_uniformbuffer) delete m_uniformbuffer;
 		if (m_framebuffer) delete m_framebuffer;
 	}
 };

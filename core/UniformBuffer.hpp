@@ -6,7 +6,7 @@
 class UniformBuffer {
 
 	UniformBuffer(const UniformBuffer&) {}
-	UniformBuffer(GLuint ubo, GLsizeiptr size): m_ubo(ubo), m_size(size) {}
+	UniformBuffer(GLuint ubo, GLsizeiptr size) : m_ubo(ubo), m_size(size), m_dirty(false) {}
 public:
 	~UniformBuffer();
 
@@ -20,6 +20,9 @@ public:
 private:
 	GLuint m_ubo;
 	GLsizeiptr m_size;
+
+	void* m_data;
+	bool m_dirty;
 };
 
 #endif 

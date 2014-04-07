@@ -14,8 +14,8 @@ public:
 
 	const float* getPosition() const;
 
-	const float* getMatView() const;
-	const float* getMatProjection() const;
+	const glm::mat4& getMatView() const { return m_view; }
+	const glm::mat4& getMatProjection() const { return m_proj; }
 
 private:
 	glm::mat4 m_view;
