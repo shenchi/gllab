@@ -39,12 +39,12 @@ bool Material::setUniform(const string& name, int size, const void* data) {
 	return true;
 }
 
-bool Material::setUniform(const std::string& name, GLuint data) {
+bool Material::setUniform(const std::string& name, GLint data) {
 	const UniformDesc* desc = m_program->getUniform(name);
 	if (!desc) return false;
 	if (desc->blockIndex < 0) {
 		glUseProgram(m_program->getProgram());
-		glUniform1ui(desc->location, data);
+		glUniform1i(desc->location, data);
 	} else {
 		// if (desc->size < sizeof(GLuint)) return false;
 		m_uniformBuffers[desc->blockIndex]->setData(desc->location, sizeof(GLuint), &data);
@@ -104,16 +104,18 @@ bool Material::setUniform(const std::string& name, const glm::mat4& data) {
 	return true;
 }
 
-void Material::setTexture(const string& name, Texture *texture) {
+bool Material::setTexture(const string& name, Texture *texture) {
 	if (m_texNames.find(name) == m_texNames.end()) {
-		if (!m_program->getUniform(name)) return;
+		if (!m_program->getUniform(name)) return false;
 
-		setUniform(name, (GLuint)m_textures.size());
+		if (!setUniform(name, (GLint)m_textures.size())) return false;
+		m_texNames[name] = m_textures.size();
 		m_textures.push_back(texture);
 	} else {
 		size_t idx = m_texNames[name];
 		m_textures[idx] = texture;
 	}
+	return true;
 }
 
 

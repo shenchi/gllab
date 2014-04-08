@@ -19,6 +19,15 @@ FrameBuffer::~FrameBuffer() {
 	if (m_depthTex) delete m_depthTex;
 }
 
+Texture* FrameBuffer::getColorTexture(size_t i) const {
+	if (i >= m_cbCount) return 0;
+	if (!m_usedTex[i]) return 0;
+	return m_colorBuffers[i].texture;
+}
+
+Texture* FrameBuffer::getDepthTexture() const {
+	return m_depthTex;
+}
 
 FrameBuffer* FrameBuffer::CreateFrameBuffer(int width, int height,
 		int nColorBuffers, RenderTargetDesc *colorBuffers, 

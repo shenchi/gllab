@@ -20,7 +20,7 @@ public:
 	static Material* CreateMaterial(Program *program = 0);
 
 	bool setUniform(const std::string& name, int size, const void* data);
-	bool setUniform(const std::string& name, GLuint data);
+	bool setUniform(const std::string& name, GLint data);
 	bool setUniform(const std::string& name, float data);
 	bool setUniform(const std::string& name, const glm::vec4& data);
 	bool setUniform(const std::string& name, const glm::vec3& data);
@@ -29,7 +29,7 @@ public:
 
 	// void setUniformBlock(const std::string& name, int size, const void* data);
 
-	void setTexture(const std::string& name, Texture *texture);
+	bool setTexture(const std::string& name, Texture *texture);
 
 
 	const Program * getProgram() const { return m_program; }

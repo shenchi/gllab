@@ -37,6 +37,9 @@ public:
 
 	GLuint getFrameBuffer() const { return m_fbo; }
 
+	Texture* getColorTexture(size_t i) const;
+	Texture* getDepthTexture() const;
+
 private:
 	GLuint m_fbo;
 
