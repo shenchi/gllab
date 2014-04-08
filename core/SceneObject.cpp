@@ -34,6 +34,7 @@ bool SceneObject::addComponent( Component* component )
 	if( component->onAddToOwner( this ) )
 	{
 		component->setOwner( this );
+		m_components.push_back( component );
 		return true;
 	}
 	return false;
