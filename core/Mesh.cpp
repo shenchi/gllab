@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "Mesh.hpp"
 #include "VertexBuffer.hpp"
+#include "SceneObject.hpp"
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -99,4 +100,15 @@ void Mesh::render() {
 		++i) {
 		if (*i) (*i)->render();
 	}
+}
+
+bool Mesh::onAddToOwner( SceneObject* owner )
+{
+	std::vector< Component* >& components = owner->getComponents();
+	for( int i = 0; i < components.size(); ++i )
+	{
+		if( components[i]->getType() == Component::TYPE_MESH ) // There's already a mesh attached to this SO.
+			return false;
+	}
+	return true;
 }
