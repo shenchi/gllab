@@ -28,9 +28,9 @@ void _check_error(const char* filename, int line) {
 // 	virtual bool onInit() {
 // 		//========================================
 // 		// prepare material
-// 		// m_program = Program::CreateFromFile("assets/diffuse_lighting.vert", "assets/diffuse_lighting.frag");
-// 		// m_program = Program::CreateFromFile("assets/specular_lighting.vert", "assets/specular_lighting.frag");
-// 		m_material = Material::CreateMaterial(Program::CreateFromFile("assets/point_light.vert", "assets/point_light.frag"));
+// 		// m_program = Program::CreateFromFile("../assets/diffuse_lighting.vert", "../assets/diffuse_lighting.frag");
+// 		// m_program = Program::CreateFromFile("../assets/specular_lighting.vert", "../assets/specular_lighting.frag");
+// 		m_material = Material::CreateMaterial(Program::CreateFromFile("../assets/point_light.vert", "../assets/point_light.frag"));
 
 // 		const Program *m_program = m_material->getProgram();
 
@@ -51,7 +51,7 @@ void _check_error(const char* filename, int line) {
 
 // 		//========================================
 // 		// prepare mesh
-// 		m_mesh = Mesh::CreateFromFile("assets/box.obj");
+// 		m_mesh = Mesh::CreateFromFile("../assets/box.obj");
 // 		assert(m_mesh != 0);
 // 		//========================================
 
@@ -121,8 +121,8 @@ public:
 	FourView(Texture *tex1, Texture *tex2, Texture *tex3, Texture *tex4): m_material(0), m_mesh(0) {
 		m_mesh = Mesh::CreateScreenQuad();
 		m_material = Material::CreateMaterial(Program::CreateFromFile(
-			"assets/deferred_shading/four_view.vert",
-			"assets/deferred_shading/four_view.frag"));
+			"../assets/deferred_shading/four_view.vert",
+			"../assets/deferred_shading/four_view.frag"));
 
 		bool result = true;
 		result = result && m_material->setTexture("view1", tex1);
@@ -164,8 +164,8 @@ public:
 	virtual bool onInit() {
 		//========================================
 		// prepare material
-		m_pass1 = Program::CreateFromFile("assets/deferred_shading/pass1.vert", "assets/deferred_shading/pass1.frag");
-		m_pass2 = Program::CreateFromFile("assets/deferred_shading/pass2.vert", "assets/deferred_shading/pass2.frag");
+		m_pass1 = Program::CreateFromFile("../assets/deferred_shading/pass1.vert", "../assets/deferred_shading/pass1.frag");
+		m_pass2 = Program::CreateFromFile("../assets/deferred_shading/pass2.vert", "../assets/deferred_shading/pass2.frag");
 		assert(m_pass1 != 0);
 		assert(m_pass2 != 0);
 
@@ -189,7 +189,7 @@ public:
 
 		//========================================
 		// prepare mesh
-		m_mesh = Mesh::CreateFromFile("assets/box.obj");
+		m_mesh = Mesh::CreateFromFile("../assets/box.obj");
 		assert(m_mesh != 0);
 		m_quadMesh = Mesh::CreateScreenQuad();
 		//========================================
