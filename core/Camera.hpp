@@ -17,6 +17,9 @@ public:
 	const glm::mat4& getMatView() const { return m_view; }
 	const glm::mat4& getMatProjection() const { return m_proj; }
 
+	const glm::mat4 getInverseView() const;
+	const glm::mat4 getInverseProjection() const;
+
 private:
 	glm::mat4 m_view;
 	glm::mat4 m_proj;

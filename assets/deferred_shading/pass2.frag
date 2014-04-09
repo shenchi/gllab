@@ -5,6 +5,7 @@ in vec2 uv;
 uniform sampler2D rt0;
 uniform sampler2D rt1;
 uniform sampler2D rt2;
+uniform mat4 invVP;
 
 uniform Lights {
 	int lightNum;
@@ -18,11 +19,14 @@ void main() {
 	vec4 matDiffuse = texture(rt0, uv);
 	matDiffuse.w = 1.0;
 	vec3 worldNormal = texture(rt1, uv).xyz;
-	vec3 worldPosition = texture(rt2, uv).xyz;
+	float depth = texture(rt2, uv).x;
+
+	vec4 worldPosition = (invVP * vec4(2 * uv.x - 1, 2 * uv.y - 1, 2 * depth - 1, 1.0));
+	worldPosition /= worldPosition.w;
 
 	vec4 finalColor = vec4(0.0);
 	for (int i = 0; i < lightNum; i++) {
-		vec3 lightDir = lightPos[i].xyz - worldPosition;
+		vec3 lightDir = lightPos[i].xyz - worldPosition.xyz;
 		float dist = length(lightDir);
 		// if (dist > 0.4) continue;
 		lightDir = normalize(lightDir);

@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace glm;
@@ -36,4 +37,13 @@ void Camera::updateView() {
 
 void Camera::setPerspective(float fov, float aspect, float zNear, float zFar) {
 	m_proj = perspective(fov, aspect, zNear, zFar);
+}
+
+
+const glm::mat4 Camera::getInverseView() const {
+	return inverse(m_view);
+}
+
+const glm::mat4 Camera::getInverseProjection() const {
+	return inverse(m_proj);
 }

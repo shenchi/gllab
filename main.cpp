@@ -197,17 +197,17 @@ public:
 		//========================================
 		// prepare frame buffer
 		RenderTargetDesc rts[] = {
-			RenderTargetDesc(GL_RGBA32F, GL_RGBA, GL_FLOAT),
-			RenderTargetDesc(GL_RGBA32F, GL_RGBA, GL_FLOAT),
-			RenderTargetDesc(GL_RGBA32F, GL_RGBA, GL_FLOAT),
+			RenderTargetDesc(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE),
+			RenderTargetDesc(GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE),
+			// RenderTargetDesc(GL_RGBA32F, GL_RGBA, GL_FLOAT),
 			// RenderTargetDesc(GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT)
 		};
-		m_gbuffer = FrameBuffer::CreateFrameBuffer(1600, 1200, 3, rts, true, true);
+		m_gbuffer = FrameBuffer::CreateFrameBuffer(1600, 1200, 2, rts, true, true);
 		assert(m_gbuffer);
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_gbuffer->getFrameBuffer());
 		GLenum drawbuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-		glDrawBuffers(3, drawbuffers);
+		glDrawBuffers(2, drawbuffers);
 		//========================================
 
 		// m_fourView = new FourView(
@@ -216,9 +216,11 @@ public:
 		// 	m_gbuffer->getDepthTexture(),
 		// 	m_gbuffer->getColorTexture(0));
 
-		m_matLightPass->setTexture("rt0", m_gbuffer->getColorTexture(0));
-		m_matLightPass->setTexture("rt1", m_gbuffer->getColorTexture(1));
-		m_matLightPass->setTexture("rt2", m_gbuffer->getColorTexture(2));
+		result = result && m_matLightPass->setTexture("rt0", m_gbuffer->getColorTexture(0));
+		result = result && m_matLightPass->setTexture("rt1", m_gbuffer->getColorTexture(1));
+		result = result && m_matLightPass->setTexture("rt2", m_gbuffer->getDepthTexture());
+		result = result && m_matLightPass->setUniform("invVP", m_camera.getInverseView() * m_camera.getInverseProjection());
+		assert( result == true );
 
 		assert( m_matLightPass->setUniform("lightNum", 6) == true );
 		glm::vec4 lightDiff[6] = {
