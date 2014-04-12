@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cmath>
 
-#include "gllab.hpp"
+#include <gllab.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -119,7 +119,7 @@ class FourView {
 	Mesh *m_mesh;
 public:
 	FourView(Texture *tex1, Texture *tex2, Texture *tex3, Texture *tex4): m_material(0), m_mesh(0) {
-		m_mesh = Mesh::CreateScreenQuad();
+		m_mesh = Mesh::CreateQuadXY();
 		m_material = Material::CreateMaterial(Program::CreateFromFile(
 			"../assets/deferred_shading/four_view.vert",
 			"../assets/deferred_shading/four_view.frag"));
@@ -191,7 +191,7 @@ public:
 		// prepare mesh
 		m_mesh = Mesh::CreateFromFile("../assets/box.obj");
 		assert(m_mesh != 0);
-		m_quadMesh = Mesh::CreateScreenQuad();
+		m_quadMesh = Mesh::CreateQuadXY();
 		//========================================
 
 		//========================================

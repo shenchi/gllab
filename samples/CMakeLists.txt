@@ -22,3 +22,6 @@ set (EXTRA_LIBS glfw3 z assimp ${APPLE_FRAMEWORKDS})
 #==================================================
 add_executable (DeferredShading1 deferred_shading1.cpp)
 target_link_libraries (DeferredShading1 ${EXTRA_LIBS} core)
+
+add_executable (Planet planet.cpp)
+target_link_libraries (Planet ${EXTRA_LIBS} core)
