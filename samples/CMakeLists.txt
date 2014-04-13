@@ -17,7 +17,7 @@ if (APPLE)
 	set (APPLE_FRAMEWORKDS ${COCOA} ${OPENGL} ${IOKIT} ${COREVIDEO})
 endif (APPLE)
 
-set (EXTRA_LIBS glfw3 z assimp ${APPLE_FRAMEWORKDS})
+set (EXTRA_LIBS glfw3 z assimp freeimage ${APPLE_FRAMEWORKDS})
 
 #==================================================
 add_executable (DeferredShading1 deferred_shading1.cpp)
