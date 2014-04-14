@@ -3,17 +3,18 @@
 
 #include "Component.hpp"
 #include "Material.hpp"
+#include "MeshFilter.hpp"
 
 class MeshRenderer : public Component
 {
 public:
-	MeshRenderer() : Component( TYPE_MESHRENDERER ), m_mesh( 0 ) {}
+	MeshRenderer() : Component( TYPE_MESHRENDERER ), m_meshFilter( 0 ) {}
 
 	virtual bool	onAddToOwner( SceneObject* owner );
 
 private:
 
-	Mesh*							m_mesh; // Mesh to render
+	MeshFilter*						m_meshFilter; // Mesh to render
 
 	std::vector< Material* >		m_materials;
 
