@@ -18,6 +18,8 @@ public:
 
 	static Texture* CreateDepthStencilTexture(int width, int height);
 
+	static Texture* CreateFromFile(const char* filename);
+
 	GLenum getTarget() const { return m_target; }
 
 	GLuint getTexture() const { return m_tex; }

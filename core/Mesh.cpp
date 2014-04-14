@@ -6,6 +6,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <cmath>
 
 // #include <cstdio>
 
@@ -70,12 +71,12 @@ Mesh* Mesh::CreateFromFile(const char *filename) {
 	return mesh;
 }
 
-Mesh* Mesh::CreateScreenQuad() {
+Mesh* Mesh::CreateQuadXY(float scale) {
 	float screenQuads[] = {
-		-1.0f, -1.0f,  0.0f,  0.0f,  0.0f,
-		 1.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-		 1.0f,  1.0f,  0.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+		-scale, -scale,  0.0f,  0.0f,  0.0f,
+		 scale, -scale,  0.0f,  1.0f,  0.0f,
+		 scale,  scale,  0.0f,  1.0f,  1.0f,
+		-scale,  scale,  0.0f,  0.0f,  1.0f,
 	};
 
 	unsigned int indices[] = {0, 1, 2, 0, 2, 3};
@@ -87,6 +88,79 @@ Mesh* Mesh::CreateScreenQuad() {
 
 	VertexBuffer *vb = VertexBuffer::CreateVertexBuffer(layout, 2, 4, screenQuads, 6, indices);
 	if (!vb) return 0;
+
+	Mesh* mesh = new Mesh();
+	mesh->m_meshes.push_back(vb);
+
+	return mesh;
+}
+
+Mesh* Mesh::CreateBox(float scale) {
+	// float vertices[] = {
+
+	// };
+	// unsigned int indices[] = {};
+	return 0;
+}
+
+Mesh* Mesh::CreateSphere(float radius, int longitudeSlice, int latitudeSlice) {
+	vector<unsigned int> indices;
+	vector<vec3> positions;
+	vector<vec3> normals;
+	vector<vec2> texcoords;
+
+	float longitudeStep = 2 * M_PI / longitudeSlice;
+	float latitudeStep = M_PI / latitudeSlice;
+	float uStep = 1.0f / longitudeSlice;
+	float vStep = 1.0f / latitudeSlice;
+
+	for (int j = 0; j <= latitudeSlice; ++j) {
+		float y = -cos(j * latitudeStep) * radius;
+		float r = sin(j * latitudeStep) * radius;
+		float v = vStep * j;
+
+		for (int i = 0; i <= longitudeSlice; ++i) {
+			float x = -cos(i * longitudeStep) * r;
+			float z = sin(i * longitudeStep) * r;
+			float u = uStep * i;
+
+			positions.push_back(vec3(x, y, z));
+			normals.push_back(normalize(vec3(x, y, z)));
+			texcoords.push_back(vec2(u, v));
+		}
+	}
+
+	for (int j = 0; j < latitudeSlice; ++j) {
+		for (int i = 0; i < longitudeSlice; ++i) {
+			int k = j * longitudeSlice + i;
+
+			indices.push_back(k);
+			indices.push_back(k + 1);
+			indices.push_back(k + longitudeSlice + 1);
+
+			indices.push_back(k);
+			indices.push_back(k + longitudeSlice + 1);
+			indices.push_back(k + longitudeSlice);
+		}
+	}
+
+	size_t size0 = sizeof(float) * 3 * positions.size();
+	size_t offset1 = size0;
+	size_t size1 = sizeof(float) * 3 * normals.size();
+	size_t offset2 = offset1 + size1;
+	size_t size2 = sizeof(float) * 2 * texcoords.size();
+
+	AttributeDesc layout[] = {
+		{0, 3, GL_FLOAT, sizeof(float) * 3, 0},
+		{1, 3, GL_FLOAT, sizeof(float) * 3, (void*)offset1},
+		{2, 2, GL_FLOAT, sizeof(float) * 2, (void*)offset2}
+	};
+
+	VertexBuffer *vb = VertexBuffer::CreateVertexBuffer(layout, 3, positions.size(), 0, indices.size(), indices.data());
+	if (!vb) return 0;
+	vb->setData(0, size0, positions.data());
+	vb->setData(offset1, size1, normals.data());
+	vb->setData(offset2, size2, texcoords.data());
 
 	Mesh* mesh = new Mesh();
 	mesh->m_meshes.push_back(vb);

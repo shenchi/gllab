@@ -12,7 +12,10 @@ public:
 	~Mesh();
 
 	static Mesh* CreateFromFile(const char *filename);
-	static Mesh* CreateScreenQuad();
+
+	static Mesh* CreateQuadXY(float scale = 1.0f);
+	static Mesh* CreateBox(float scale = 1.0f);
+	static Mesh* CreateSphere(float radius = 1.0f, int longitudeSlice = 10, int latitudeSlice = 10);
 
 	void render();
 
