@@ -11,11 +11,12 @@ public:
 	enum Type
 	{
 		TYPE_UNKNOWN = -1,
-		TYPE_MESH,
+		TYPE_MESHFILTER,
+		TYPE_MESHRENDERER,
 	};
 
 public:
-	Component( int type ) : m_type( type ), m_owner( 0 ) {}
+	Component( int type ) : m_enabled( true ), m_type( type ), m_owner( 0 ) {}
 	virtual ~Component() {}
 
 
@@ -27,6 +28,7 @@ public:
 
 	virtual bool	onAddToOwner( SceneObject* owner ) { return true; }
 protected:
+	bool			m_enabled;
 	int				m_type;
 
 	SceneObject*	m_owner;

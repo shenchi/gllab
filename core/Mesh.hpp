@@ -6,9 +6,9 @@
 
 class VertexBuffer;
 
-class Mesh : public Component {
+class Mesh {
 public:
-	Mesh() : Component( TYPE_MESH ) {}
+	Mesh() {}
 	~Mesh();
 
 	static Mesh* CreateFromFile(const char *filename);
@@ -16,8 +16,6 @@ public:
 
 	void render();
 
-
-	virtual bool	onAddToOwner( SceneObject* owner );
 private:
 	std::vector<VertexBuffer*> m_meshes;
 };
