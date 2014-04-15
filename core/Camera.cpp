@@ -26,7 +26,7 @@ const float* Camera::getPosition() const {
 void Camera::updateView() {
 	m_view = mat4(1.0f);
 
-	// order zx
+	// order zxy
 	m_view = rotate(m_view, m_rot.z, vec3(0.0f, 0.0f, 1.0f));
 	m_view = rotate(m_view, m_rot.x, vec3(-1.0f, 0.0f, 0.0f));
 	m_view = rotate(m_view, m_rot.y, vec3(0.0f, 1.0f, 0.0f));
