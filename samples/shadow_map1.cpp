@@ -84,7 +84,7 @@ public:
 
 		m_box = Mesh::CreateFromFile("../assets/box.obj");
 		m_ground = Mesh::CreateQuadXY(10);
-		m_groundMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+		m_groundMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, 0.0f));
 		m_groundMat = glm::rotate(m_groundMat, (float)M_PI * 0.5f, glm::vec3(-1.0f, 0.0f, 0.0f));
 
 		glEnable(GL_CULL_FACE);
@@ -93,10 +93,10 @@ public:
 		return true;
 	}
 
-	virtual void onFrame() {
+	virtual void onFrame(float dt) {
 		m_shadowMapPass->bind();
-		// m_shadowMapPass->setModelMatrix(m_groundMat);
-		// m_ground->render();
+		m_shadowMapPass->setModelMatrix(m_groundMat);
+		m_ground->render();
 		m_shadowMapPass->setModelMatrix(glm::mat4(1.0f));
 		m_box->render();
 

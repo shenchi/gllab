@@ -21,19 +21,42 @@ void Engine::run(int w, int h) {
 
 	glfwMakeContextCurrent(m_window);
 	
+	m_timer = new Timer();
+
 	if (!onInit()) {
 		glfwTerminate();
 		return;
 	}
 
+	glfwSwapInterval(0); // turn off vsync
+
+	float lastTime = m_timer->now();
+	float nowTime = 0.0f;
+	int frameCount = 0;
+	float delta = 0.0f;
+	float totalDelta = 0.0f;
+
 	while (!glfwWindowShouldClose(m_window)) {
-		onFrame();
+		nowTime = m_timer->now();
+		delta = nowTime - lastTime;
+		lastTime = nowTime;
+
+		onFrame(delta);
 		glfwSwapBuffers(m_window);
+
+		frameCount++;
+		totalDelta += delta;
+		if (totalDelta > 1.0f) {
+			totalDelta -= 1.0f;
+			printf("frame rate: %d\n", frameCount);
+			frameCount = 0;
+		}
+
 		glfwPollEvents();
 	}
 
 	onRelease();
-
+	delete m_timer;
 	glfwTerminate();
 }
 

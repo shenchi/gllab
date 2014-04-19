@@ -44,7 +44,7 @@ public:
 		return true;
 	}
 
-	virtual void onFrame() {
+	virtual void onFrame(float dt) {
 		count++;
 		float r = count / 100.0f;
 

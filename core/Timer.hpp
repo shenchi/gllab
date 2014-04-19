@@ -1,9 +1,16 @@
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef TIMER_HPP
+#define TIMER_HPP
+
+#include <cstdint>
 
 class Timer {
+	uint64_t startTime;
+
+	float conversion;
 public:
-	//static unsigned
+	Timer();
+
+	float now();
 };
 
 #endif

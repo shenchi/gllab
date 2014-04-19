@@ -157,8 +157,6 @@ class DeferredShading : public Engine {
 	FrameBuffer *m_gbuffer;
 
 	// FourView *m_fourView;
-
-	unsigned int count;
 public:
 
 	virtual bool onInit() {
@@ -234,18 +232,16 @@ public:
 		assert(sizeof(lightDiff) == 4 * 4 * 6);
 		assert( m_matLightPass->setUniform("lightDiffuse[0]", sizeof(lightDiff), &lightDiff) == true );
 
-		count = 0;
-
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
+
 		return true;
 	}
 
-	virtual void onFrame() {
-		count ++;
-		float r = count / 100.0f;
+	virtual void onFrame(float dt) {
+		float r = m_timer->now();
 
 		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)M_PI * 0.1f * r, glm::vec3(0.0f, -1.0f, 0.0f));
 		assert( m_material1->setUniform("matModel", model) == true );
