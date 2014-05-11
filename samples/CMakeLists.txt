@@ -28,3 +28,6 @@ target_link_libraries (ShadowMap1 ${EXTRA_LIBS} core)
 
 add_executable (Planet planet.cpp)
 target_link_libraries (Planet ${EXTRA_LIBS} core)
+
+add_executable (LargerScene larger_scene.cpp)
+target_link_libraries (LargerScene ${EXTRA_LIBS} core)

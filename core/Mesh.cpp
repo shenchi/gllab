@@ -37,6 +37,7 @@ Mesh* Mesh::CreateFromFile(const char *filename) {
 		bool hasNormal = m->HasNormals();
 
 		unsigned int vertCount = m->mNumVertices;
+		unsigned int faceCount = m->mNumFaces;
 		vector<unsigned int> indices;
 		vector<vec3> positions;
 		vector<vec3> normals;
@@ -58,6 +59,15 @@ Mesh* Mesh::CreateFromFile(const char *filename) {
 			}
 		}
 
+		for (size_t i = 0; i < faceCount; ++i) {
+			const aiFace* face = &(m->mFaces[i]);
+			if (face->mNumIndices == 3) {
+				indices.push_back(face->mIndices[0]);
+				indices.push_back(face->mIndices[1]);
+				indices.push_back(face->mIndices[2]);
+			}
+		}
+
 		VertexBuffer *vb = VertexBuffer::CreateVertexBuffer(layout.data(), layout.size(), vertCount, 0, indices.size(), indices.data());
 		if (!vb) return 0;
 		vb->setData(0, posDataSize, positions.data());
@@ -71,12 +81,19 @@ Mesh* Mesh::CreateFromFile(const char *filename) {
 	return mesh;
 }
 
-Mesh* Mesh::CreateQuadXY(float scale) {
+Mesh* Mesh::CreateQuadXY(float scale, bool normal) {
 	float screenQuads[] = {
 		-scale, -scale,  0.0f,  0.0f,  0.0f,
 		 scale, -scale,  0.0f,  1.0f,  0.0f,
 		 scale,  scale,  0.0f,  1.0f,  1.0f,
 		-scale,  scale,  0.0f,  0.0f,  1.0f,
+	};
+
+	float screenQuadsN[] = {
+		-scale, -scale,  0.0f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+		 scale, -scale,  0.0f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+		 scale,  scale,  0.0f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+		-scale,  scale,  0.0f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
 	};
 
 	unsigned int indices[] = {0, 1, 2, 0, 2, 3};
@@ -86,7 +103,13 @@ Mesh* Mesh::CreateQuadXY(float scale) {
 		{1, 2, GL_FLOAT, sizeof(float) * 5, (void*)(sizeof(float) * 3)}
 	};
 
-	VertexBuffer *vb = VertexBuffer::CreateVertexBuffer(layout, 2, 4, screenQuads, 6, indices);
+	AttributeDesc layoutN[] = {
+		{0, 3, GL_FLOAT, sizeof(float) * 8, 0},
+		{1, 3, GL_FLOAT, sizeof(float) * 8, (void*)(sizeof(float) * 3)},
+		{2, 2, GL_FLOAT, sizeof(float) * 8, (void*)(sizeof(float) * 6)}
+	};
+
+	VertexBuffer *vb = VertexBuffer::CreateVertexBuffer(normal ? layoutN : layout, 3, 4, normal ? screenQuadsN : screenQuads, 6, indices);
 	if (!vb) return 0;
 
 	Mesh* mesh = new Mesh();
@@ -132,15 +155,15 @@ Mesh* Mesh::CreateSphere(float radius, int longitudeSlice, int latitudeSlice) {
 
 	for (int j = 0; j < latitudeSlice; ++j) {
 		for (int i = 0; i < longitudeSlice; ++i) {
-			int k = j * longitudeSlice + i;
+			int k = j * (longitudeSlice + 1) + i;
 
 			indices.push_back(k);
 			indices.push_back(k + 1);
-			indices.push_back(k + longitudeSlice + 1);
+			indices.push_back(k + longitudeSlice + 2);
 
 			indices.push_back(k);
+			indices.push_back(k + longitudeSlice + 2);
 			indices.push_back(k + longitudeSlice + 1);
-			indices.push_back(k + longitudeSlice);
 		}
 	}
 

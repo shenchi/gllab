@@ -35,4 +35,5 @@ void main() {
 	}
 
 	fragColor = finalColor;
+	// fragColor = vec4(2 * uv.x - 1, 2 * uv.y - 1, 2 * depth - 1, 1.0);
 }

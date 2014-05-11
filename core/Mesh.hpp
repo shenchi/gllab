@@ -13,7 +13,7 @@ public:
 
 	static Mesh* CreateFromFile(const char *filename);
 
-	static Mesh* CreateQuadXY(float scale = 1.0f);
+	static Mesh* CreateQuadXY(float scale = 1.0f, bool normal = false);
 	static Mesh* CreateBox(float scale = 1.0f);
 	static Mesh* CreateSphere(float radius = 1.0f, int longitudeSlice = 10, int latitudeSlice = 10);
 
