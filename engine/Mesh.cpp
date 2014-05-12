@@ -1,6 +1,6 @@
-#include "common.hpp"
+#include "core/common.hpp"
 #include "Mesh.hpp"
-#include "VertexBuffer.hpp"
+#include "core/VertexBuffer.hpp"
 #include "SceneObject.hpp"
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>

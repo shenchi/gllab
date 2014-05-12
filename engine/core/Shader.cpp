@@ -1,6 +1,34 @@
 #include "Shader.hpp"
 #include <cstdio>
 
+static const char* builtInVertShaderHeader = 
+R"(#version 400
+layout(location = 0) vec4 inPosition;
+layout(location = 1) vec4 inNormal;
+layout(location = 2) vec2 inUV;
+
+uniform block BuiltInCamera {
+	mat4 matProjection;
+	mat4 matView;
+};
+
+uniform block BuiltInTransform {
+	mat4 matModel;
+};
+
+mat4 matProjectionView;
+mat4 matProjectionViewModel;
+)";
+
+
+static const char* builtInVertShaderMain = 
+R"(void main() {
+	matProjectionView = matProjection * matView;
+	matProjectionViewModel = matProjectionView * matModel;
+	gl_Position = vert();
+}
+)";
+
 Shader::~Shader() {
 	if (m_shader) glDeleteShader(m_shader);
 	m_shader = 0;
@@ -16,13 +44,19 @@ const char* Shader::shaderTypeName(GLenum type) {
 	return "unknow type shader";
 }
 
-Shader* Shader::CreateFromSource(GLenum type, const char *source) {
+Shader* Shader::CreateFromSource(GLenum type, const char *source, bool withBuiltIn) {
 	GLuint shader = 0;
 
 	shader = glCreateShader(type);
 	if (!shader) return 0;
 
-	glShaderSource(shader, 1, &source, 0);
+	if (withBuiltIn && type == GL_VERTEX_SHADER) {
+		const char* sources[3] = {builtInVertShaderHeader, source, builtInVertShaderMain};
+		glShaderSource(shader, 3, sources, 0);
+	} else {
+		glShaderSource(shader, 1, &source, 0);
+	}
+
 	glCompileShader(shader);
 
 	int result = GL_FALSE;
@@ -34,10 +68,10 @@ Shader* Shader::CreateFromSource(GLenum type, const char *source) {
 		return 0;
 	}
 
-	return new Shader(shader);
+	return new Shader(shader, withBuiltIn);
 }
 
-Shader* Shader::CreateFromFile(GLenum type, const char *filename) {
+Shader* Shader::CreateFromFile(GLenum type, const char *filename, bool withBuiltIn) {
 	char *source = 0;
 	Shader *shader = 0;
 	FILE *fp = fopen(filename, "r");
@@ -60,7 +94,7 @@ Shader* Shader::CreateFromFile(GLenum type, const char *filename) {
 	}
 	fclose(fp);
 
-	shader = CreateFromSource(type, source);
+	shader = CreateFromSource(type, source, withBuiltIn);
 	delete [] source;
 
 	return shader;

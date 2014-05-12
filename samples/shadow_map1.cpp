@@ -74,7 +74,7 @@ public:
 	}
 };
 
-class ShadowMap : public Engine {
+class ShadowMap : public EngineBase {
 
 	ShadowMapPass *m_shadowMapPass;
 

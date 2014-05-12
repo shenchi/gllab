@@ -143,7 +143,7 @@ public:
 	}
 };
 
-class DeferredShading : public Engine {
+class DeferredShading : public EngineBase {
 
 	Program* m_pass1;
 	Program* m_pass2;

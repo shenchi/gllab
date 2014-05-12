@@ -12,7 +12,7 @@ void _check_error(const char* filename, int line) {
 
 #define check_error() _check_error( __FILE__, __LINE__ )
 
-class LargerScene : public Engine {
+class LargerScene : public EngineBase {
 
 	Camera* m_cam;
 

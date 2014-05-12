@@ -23,9 +23,10 @@ public:
 
 	static Program* CreateFromFile(const char *vertFilename, const char *fragFilename);
 
-	void attachVertexShader(Shader *shader) {m_vs = shader; }
-	void attachPixelShader(Shader *shader) {m_fs = shader; }
-	// void link();  disable relink
+	// unchangeable after created
+	// void attachVertexShader(Shader *shader) {m_vs = shader; }
+	// void attachPixelShader(Shader *shader) {m_fs = shader; }
+	// void link();
 
 	GLuint getProgram() const;
 

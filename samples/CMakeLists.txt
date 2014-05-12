@@ -1,6 +1,6 @@
 list(APPEND CMAKE_CXX_FLAGS "-std=c++0x")
 
-include_directories (AFTER "${PROJECT_SOURCE_DIR}/core")
+include_directories (AFTER "${PROJECT_SOURCE_DIR}/engine")
 
 if (APPLE)
 	set (THIRD_PARTY_LIB_SUFFIX "/osx")

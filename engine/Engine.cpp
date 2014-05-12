@@ -1,9 +1,9 @@
 #include "Engine.hpp"
 
-Engine::~Engine() {
+EngineBase::~EngineBase() {
 }
 
-void Engine::run(int w, int h) {
+void EngineBase::run(int w, int h) {
 	if (!glfwInit())
 		return;
 
@@ -60,7 +60,15 @@ void Engine::run(int w, int h) {
 	glfwTerminate();
 }
 
-void Engine::useProgram(Program *program) {
-	if (!program || !program->getProgram()) return;
-	glUseProgram(program->getProgram());
+
+bool Engine::onInit() {
+
+}
+
+void Engine::onFrame(float dt) {
+	
+}
+
+void Engine::onRelease() {
+	
 }

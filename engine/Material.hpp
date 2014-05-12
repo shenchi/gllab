@@ -1,10 +1,10 @@
 #ifndef MATERIAL_HPP
 #define MATERIAL_HPP
 
-#include "common.hpp"
-#include "Program.hpp"
-#include "Texture.hpp"
-#include "UniformBuffer.hpp"
+#include "core/common.hpp"
+#include "core/Program.hpp"
+#include "core/Texture.hpp"
+#include "core/UniformBuffer.hpp"
 
 #include <unordered_map>
 #include <string>

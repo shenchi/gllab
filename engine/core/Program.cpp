@@ -38,6 +38,8 @@ Program* Program::CreateFromFile(const char *vertFilename, const char *fragFilen
 Program::~Program() {
 	if (m_program) glDeleteProgram(m_program);
 	m_program = 0;
+	if (m_vs) delete m_vs;
+	if (m_fs) delete m_fs;
 }
 
 // void Program::link() {
