@@ -62,7 +62,7 @@ void EngineBase::run(int w, int h) {
 
 
 bool Engine::onInit() {
-
+	return true;
 }
 
 void Engine::onFrame(float dt) {

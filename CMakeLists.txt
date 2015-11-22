@@ -4,7 +4,8 @@ list(APPEND CMAKE_CXX_FLAGS "-std=c++0x")
 
 project (gllab)
 
-include_directories ("${PROJECT_SOURCE_DIR}/3rd_party/glm" "${PROJECT_SOURCE_DIR}/3rd_party/assimp/include" "${PROJECT_SOURCE_DIR}/3rd_party/rapidxml")
+include_directories ("${PROJECT_SOURCE_DIR}/3rd_party/rapidxml" "/usr/local/include")
+link_directories ("/usr/local/lib")
 
 add_subdirectory(engine)
 add_subdirectory(samples)
