@@ -241,7 +241,7 @@ public:
 	}
 
 	virtual void onFrame(float dt) {
-		float r = m_timer->now();
+		float r = m_timer->elapsed();
 
 		glm::mat4 model = glm::rotate(glm::mat4(1.0f), (float)M_PI * 0.1f * r, glm::vec3(0.0f, -1.0f, 0.0f));
 		assert( m_material1->setUniform("matModel", model) == true );

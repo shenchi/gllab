@@ -30,14 +30,14 @@ void EngineBase::run(int w, int h) {
 
 	glfwSwapInterval(0); // turn off vsync
 
-	float lastTime = m_timer->now();
+	float lastTime = m_timer->elapsed();
 	float nowTime = 0.0f;
 	int frameCount = 0;
 	float delta = 0.0f;
 	float totalDelta = 0.0f;
 
 	while (!glfwWindowShouldClose(m_window)) {
-		nowTime = m_timer->now();
+		nowTime = m_timer->elapsed();
 		delta = nowTime - lastTime;
 		lastTime = nowTime;
 

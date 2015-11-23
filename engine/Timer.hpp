@@ -1,16 +1,22 @@
 #ifndef TIMER_HPP
 #define TIMER_HPP
 
-#include <cstdint>
+#include <chrono>
 
 class Timer {
-	uint64_t startTime;
+	typedef std::chrono::high_resolution_clock Clock;
+	typedef float duration;
 
-	float conversion;
+	Clock::time_point start;
 public:
-	Timer();
+	Timer() : start(Clock::now()) {}
 
-	float now();
+	void reset() { start = Clock::now(); }
+
+	duration elapsed() const {
+		return (Clock::now() - start).count() * 
+			((duration)Clock::period::num / Clock::period::den);
+	}
 };
 
 #endif

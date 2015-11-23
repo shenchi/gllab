@@ -77,10 +77,10 @@ void Program::reflect() {
 		int idx = 0;
 		glGetActiveUniform(m_program, i, sizeof(name), &length, &size, &type, name);
 		glGetActiveUniformsiv(m_program, 1, &i, GL_UNIFORM_BLOCK_INDEX, &idx);
-		if (idx < 0) {
+		if (idx < 0) { // uniforms out of an uniform block
 			GLint loc = glGetUniformLocation(m_program, name);
 			m_uniforms[name] = UniformDesc{ idx, loc, size, type };
-		} else {
+		} else { // uniforms in an uniform block
 			GLint offset = 0;
 			glGetActiveUniformsiv(m_program, 1, &i, GL_UNIFORM_OFFSET, &offset);
 			m_uniforms[name] = UniformDesc{ idx, offset, size, type };

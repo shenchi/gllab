@@ -33,6 +33,9 @@ public:
 	GLint getAttributeLocation(const std::string& name) const;
 	const UniformDesc* getUniform(const std::string& name) const;
 
+	const std::unordered_map< std::string, GLint >& getAttributes() const { return m_attributes; }
+	const std::unordered_map< std::string, UniformDesc >& getUniforms() const { return m_uniforms; }
+
 	typedef std::pair< std::string, int > BlockDesc;
 	const std::vector< BlockDesc >& getUniformBlockList() const { return m_uniformBlocks; }
 
