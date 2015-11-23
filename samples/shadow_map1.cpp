@@ -21,7 +21,7 @@ class ShadowMapPass {
 
 	size_t m_bufferSize;
 public:
-	ShadowMapPass(size_t bufferSize) : m_bufferSize(bufferSize), m_mat(0), m_fb(0), m_cam(0) {
+	ShadowMapPass(size_t bufferSize) : m_mat(0), m_fb(0), m_cam(0), m_bufferSize(bufferSize) {
 		m_mat = Material::CreateMaterial(Program::CreateFromFile("../assets/shadow_map/pass1.vert", "../assets/shadow_map/pass1.frag"));
 		RenderTargetDesc rts[] = {
 			RenderTargetDesc()

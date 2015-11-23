@@ -27,7 +27,7 @@ struct RenderTargetDesc {
 class FrameBuffer {
 
 	FrameBuffer(const FrameBuffer &) {}
-	FrameBuffer(): m_fbo(0), m_colorBuffers(0), m_usedTex(0), m_cbCount(0), m_depthRBO(0), m_depthTex(0) {}
+	FrameBuffer(): m_fbo(0), m_cbCount(0), m_colorBuffers(0), m_usedTex(0), m_depthRBO(0), m_depthTex(0) {}
 public:
 	~FrameBuffer();
 
