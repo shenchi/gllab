@@ -60,7 +60,7 @@ public:
 	void unbind() {
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		// glDrawBuffer(GL_BACK);
-		glViewport(0, 0, 1600, 1200);
+		glViewport(0, 0, 800, 600);
 	}
 
 	Texture *getTexture() {
@@ -81,16 +81,21 @@ class ShadowMap : public EngineBase {
 	Camera *m_cam;
 	Material *m_mat;
 	Mesh *m_box;
+    Mesh *m_box2;
 	Mesh *m_ground;
 	glm::mat4 m_boxMat;
+	glm::mat4 m_boxMat2;
 	glm::mat4 m_groundMat;
 
 	// Material *m_testMat;
 	// Mesh *m_testMesh;
 public:
 	virtual bool onInit() {
+        glm::vec3 lightPos(5.0f, 5.0f, 5.0f);
+        glm::vec3 lightDist(0.0f, 0.0f, 0.0f);
+        
 		m_shadowMapPass = new ShadowMapPass(2048);
-		m_shadowMapPass->setLight(glm::vec3(5.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		m_shadowMapPass->setLight(lightPos, lightDist);
 
 		// m_testMat = Material::CreateMaterial(Program::CreateFromFile("../assets/quad.vert", "../assets/depth_dump.frag"));
 		// m_testMesh = Mesh::CreateQuadXY();
@@ -104,13 +109,19 @@ public:
 		m_mat = Material::CreateMaterial(Program::CreateFromFile("../assets/shadow_map/pass2.vert", "../assets/shadow_map/pass2.frag"));
 		assert( m_mat->setUniform("matProj", m_cam->getMatProjection()) == true );
 		assert( m_mat->setUniform("matView", m_cam->getMatView()) == true );
-		assert( m_mat->setUniform("lightViewProj", m_shadowMapPass->getViewProjMatrix()) == true );
+        assert( m_mat->setUniform("lightViewProj", m_shadowMapPass->getViewProjMatrix()) == true );
+        assert( m_mat->setUniform("lightPos", glm::vec4(lightPos, 1.0f)) == true );
+        assert( m_mat->setUniform("lightDir", glm::vec4(glm::normalize(lightPos - lightDist), 0.0f)) == true );
+        assert( m_mat->setUniform("lightColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)) == true );
+        assert( m_mat->setUniform("color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f)) == true);
 		// assert( m_mat->setUniform("invViewProj", glm::inverse(m_cam->getMatProjection() * m_cam->getMatView())) == true);
 		assert( m_mat->setTexture("depthTex", m_shadowMapPass->getTexture()) == true );
 
 		m_box = Mesh::CreateFromFile("../assets/box.obj");
+        m_box2 = Mesh::CreateFromFile("../assets/box.obj");
 		m_boxMat = glm::mat4(1.0f);
-		m_ground = Mesh::CreateQuadXY(10);
+        m_boxMat2 = glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f)), glm::vec3(0.5f, 0.5f, 0.5f));
+		m_ground = Mesh::CreateQuadXY(10, true);
 		m_groundMat = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, 0.0f));
 		m_groundMat = glm::rotate(m_groundMat, (float)M_PI * 0.5f, glm::vec3(-1.0f, 0.0f, 0.0f));
 
@@ -124,12 +135,16 @@ public:
 
 	virtual void onFrame(float dt) {
 		m_boxMat = glm::rotate(m_boxMat, dt * 0.1f, glm::vec3(0, 1, 0));
+        m_boxMat2 = glm::rotate(m_boxMat2, -dt * 0.1f, glm::vec3(0, 1, 0));
 
 		m_shadowMapPass->bind();
 		m_shadowMapPass->setModelMatrix(m_groundMat);
 		m_ground->render();
 		m_shadowMapPass->setModelMatrix(m_boxMat);
 		m_box->render();
+        m_shadowMapPass->setModelMatrix(m_boxMat2);
+        m_box2->render();
+        
 
 		m_shadowMapPass->unbind();
 		// glDisable(GL_DEPTH_TEST);
@@ -138,11 +153,11 @@ public:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		m_mat->bind();
 		m_mat->setUniform("matModel", m_groundMat);
-		m_mat->setUniform("color", glm::vec4(0.6f, 0.6f, 0.6f, 1.0f));
 		m_ground->render();
 		m_mat->setUniform("matModel", m_boxMat);
-		m_mat->setUniform("color", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
 		m_box->render();
+        m_mat->setUniform("matModel", m_boxMat2);
+        m_box2->render();
 	}
 
 	virtual void onRelease() {
@@ -150,7 +165,8 @@ public:
 
 		delete m_cam;
 		delete m_mat;
-		delete m_box;
+        delete m_box;
+        delete m_box2;
 		delete m_ground;
 		// delete m_testMat;
 		// delete m_testMesh;
